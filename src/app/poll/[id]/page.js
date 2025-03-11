@@ -338,7 +338,7 @@ export default function PollPage() {
                       key={option.id}
                       onClick={() => setSelectedOption(option?._id)}
                       className={`w-full p-4 text-left rounded-lg border ${
-                        selectedOption === option.id
+                        selectedOption === option._id
                           ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-400"
                           : "border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50"
                       }`}
