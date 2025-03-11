@@ -90,24 +90,54 @@ export default function PollPage() {
     if (!selectedOption || hasVoted) return;
 
     try {
-      // In a real app, send the vote to your API
-      // Simulate voting
-      const updatedPoll = { ...poll };
-      const optionIndex = updatedPoll.options.findIndex(
-        (opt) => opt.id === selectedOption
+      // Call the vote API with the correct URL
+      const response = await fetch(
+        `http://localhost:5000/api/polls/${id}/vote`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            optionId: selectedOption,
+          }),
+        }
       );
-      updatedPoll.options[optionIndex].votes += 1;
-      updatedPoll.totalVotes += 1;
 
-      setPoll(updatedPoll);
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.message || "Failed to submit vote");
+      }
+
+      // Update the UI with the response data
+      if (data.data?.options) {
+        // If the poll doesn't hide results, update with actual vote counts
+        setPoll((prev) => ({
+          ...prev,
+          options: data.data.options,
+        }));
+      } else {
+        // If results are hidden, just increment the local count
+        setPoll((prev) => ({
+          ...prev,
+          options: prev.options.map((opt) =>
+            opt._id === selectedOption
+              ? { ...opt, votes: (opt.votes || 0) + 1 }
+              : opt
+          ),
+        }));
+      }
+
       setHasVoted(true);
-      setTotalVotes((prev) => prev + 1);
       setShowResults(true);
+      setTotalVotes((prev) => prev + 1);
 
       // Save to localStorage to remember the vote
       localStorage.setItem(`voted_${id}`, "true");
     } catch (err) {
-      setError("Couldn't register your vote. Please try again.");
+      console.error("Vote error:", err);
+      setError(err.message || "Couldn't register your vote. Please try again.");
     }
   };
 
@@ -272,14 +302,14 @@ export default function PollPage() {
                   {poll?.options?.map((option) => (
                     <button
                       key={option.id}
-                      onClick={() => setSelectedOption(option.id)}
+                      onClick={() => setSelectedOption(option?._id)}
                       className={`w-full p-4 text-left rounded-lg border ${
                         selectedOption === option.id
                           ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-400"
                           : "border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50"
                       }`}
                       type="button"
-                      aria-pressed={selectedOption === option.id}
+                      aria-pressed={selectedOption === option?._id}
                     >
                       {option.text}
                     </button>
