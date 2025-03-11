@@ -154,7 +154,7 @@ export default function PollPage() {
     setIsSubmitting(true);
     try {
       const response = await fetch(
-        `http://localhost:5000/api/polls/${id}/comment`,
+        `${process.env.NEXT_PUBLIC_API_URL}/polls/${id}/comment`,
         {
           method: "POST",
           headers: {

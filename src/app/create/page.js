@@ -5,7 +5,8 @@ import Link from "next/link";
 
 // Add the API base URL configuration
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+  process.env.NEXT_PUBLIC_API_URL ||
+  "https://vanish-vote-server-five.vercel.app/api";
 
 export default function CreatePoll() {
   const router = useRouter();
