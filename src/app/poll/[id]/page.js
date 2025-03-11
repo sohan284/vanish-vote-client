@@ -19,6 +19,7 @@ export default function PollPage() {
   const [isTrending, setIsTrending] = useState(false);
   const [likes, setLikes] = useState(0);
   const [hasLiked, setHasLiked] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Mock poll data for demo purposes
   useEffect(() => {
@@ -33,20 +34,20 @@ export default function PollPage() {
 
         const pollData = await response.json();
 
-        setPoll(pollData?.data);
-        setTotalVotes(pollData?.data?.totalVotes);
-        setLikes(pollData?.data?.likes);
-        setIsTrending(pollData?.data?.isTrending);
-        setShowResults(!pollData?.data?.hideResults);
+        if (pollData?.data) {
+          // Calculate total votes from options
+          const totalVoteCount = pollData.data.options.reduce(
+            (sum, option) => sum + (option.votes || 0),
+            0
+          );
 
-        // Fetch comments if they're stored separately
-        // const commentsResponse = await fetch(
-        //   `${process.env.NEXT_PUBLIC_API_URL}/polls/${id}/comments`
-        // );
-        // if (commentsResponse.ok) {
-        //   const commentsData = await commentsResponse.json();
-        //   setComments(commentsData);
-        // }
+          setPoll(pollData.data);
+          setTotalVotes(totalVoteCount);
+          setLikes(pollData.data.reactions?.like || 0);
+          setIsTrending(pollData.data.reactions?.trending > 0);
+          setShowResults(!pollData.data.hideResults);
+          setComments(pollData.data.comments || []);
+        }
 
         setLoading(false);
       } catch (err) {
@@ -90,9 +91,8 @@ export default function PollPage() {
     if (!selectedOption || hasVoted) return;
 
     try {
-      // Call the vote API with the correct URL
       const response = await fetch(
-        `http://localhost:5000/api/polls/${id}/vote`,
+        `${process.env.NEXT_PUBLIC_API_URL}/polls/${id}/vote`,
         {
           method: "POST",
           headers: {
@@ -112,13 +112,19 @@ export default function PollPage() {
 
       // Update the UI with the response data
       if (data.data?.options) {
-        // If the poll doesn't hide results, update with actual vote counts
+        // Calculate new total votes from updated options
+        const newTotalVotes = data.data.options.reduce(
+          (sum, option) => sum + (option.votes || 0),
+          0
+        );
+
         setPoll((prev) => ({
           ...prev,
           options: data.data.options,
         }));
+        setTotalVotes(newTotalVotes);
       } else {
-        // If results are hidden, just increment the local count
+        // If results are hidden, increment local count
         setPoll((prev) => ({
           ...prev,
           options: prev.options.map((opt) =>
@@ -127,11 +133,11 @@ export default function PollPage() {
               : opt
           ),
         }));
+        setTotalVotes((prev) => prev + 1);
       }
 
       setHasVoted(true);
       setShowResults(true);
-      setTotalVotes((prev) => prev + 1);
 
       // Save to localStorage to remember the vote
       localStorage.setItem(`voted_${id}`, "true");
@@ -141,17 +147,44 @@ export default function PollPage() {
     }
   };
 
-  const handleAddComment = () => {
-    if (!comment.trim()) return;
+  const handleAddComment = async () => {
+    if (!comment.trim() || isSubmitting) return;
 
-    const newComment = {
-      id: Date.now(),
-      text: comment,
-      timestamp: "Just now",
-    };
+    setIsSubmitting(true);
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/polls/${id}/comment`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            text: comment.trim(),
+          }),
+        }
+      );
 
-    setComments([newComment, ...comments]);
-    setComment("");
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.message || "Failed to add comment");
+      }
+
+      const newComment = {
+        id: data.data.comment._id,
+        text: data.data.comment.text,
+        timestamp: "Just now",
+      };
+
+      setComments((prevComments) => [newComment, ...prevComments]);
+      setComment("");
+    } catch (err) {
+      console.error("Comment error:", err);
+      alert(err.message || "Couldn't add your comment. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleLike = () => {
@@ -333,13 +366,13 @@ export default function PollPage() {
                     const percentage = getPercentage(option.votes);
 
                     return (
-                      <div key={option.id} className="space-y-1">
+                      <div key={option._id} className="space-y-1">
                         <div className="flex justify-between text-sm">
                           <span className="text-gray-700 dark:text-gray-300">
                             {option.text}
                           </span>
                           <span className="text-gray-500 dark:text-gray-400">
-                            {percentage}% ({option.votes} votes)
+                            {percentage}% ({option.votes || 0} votes)
                           </span>
                         </div>
                         <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
@@ -412,14 +445,14 @@ export default function PollPage() {
                 />
                 <button
                   onClick={handleAddComment}
-                  disabled={!comment.trim()}
+                  disabled={!comment.trim() || isSubmitting}
                   className={`px-4 py-2 rounded-lg text-white font-medium ${
-                    !comment.trim()
+                    !comment.trim() || isSubmitting
                       ? "bg-blue-400 cursor-not-allowed"
                       : "bg-blue-600 hover:bg-blue-700"
-                  }`}
+                  } ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
                 >
-                  Post
+                  {isSubmitting ? "Adding..." : "Add Comment"}
                 </button>
               </div>
 
