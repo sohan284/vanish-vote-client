@@ -66,6 +66,12 @@ export default function PollsTable() {
                   Options
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  Comments
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  Likes
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Expires
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -74,7 +80,7 @@ export default function PollsTable() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-600">
-              {polls.length === 0 ? (
+              {polls?.length === 0 ? (
                 <tr>
                   <td
                     colSpan="5"
@@ -84,7 +90,7 @@ export default function PollsTable() {
                   </td>
                 </tr>
               ) : (
-                polls.map((poll) => (
+                polls?.map((poll) => (
                   <tr
                     key={poll._id}
                     className="hover:bg-gray-50 dark:hover:bg-gray-700"
@@ -97,6 +103,12 @@ export default function PollsTable() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-gray-700 dark:text-gray-300">
                       {poll.optionCount}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-gray-700 dark:text-gray-300">
+                      {poll.commentCount}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-gray-700 dark:text-gray-300">
+                      {poll.reactions?.like}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-gray-700 dark:text-gray-300">
                       {new Date(poll.expiresAt).toLocaleString()}

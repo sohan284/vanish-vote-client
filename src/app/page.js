@@ -81,13 +81,6 @@ export default function Home() {
                   </Link>
                 </div>
               </div>
-              <div className="hidden md:block">
-                <img
-                  src="/api/placeholder/300/300"
-                  alt="Voting Illustration"
-                  className="w-64 h-64"
-                />
-              </div>
             </div>
           </div>
         </div>
@@ -146,7 +139,7 @@ export default function Home() {
       <footer className="mt-20 py-8 bg-gray-100 dark:bg-gray-900">
         <div className="container mx-auto px-4 text-center text-gray-500 dark:text-gray-400">
           <p>&copy; 2025 VanishVote. All rights reserved.</p>
-          <div className="mt-2 flex justify-center space-x-4">
+          {/* <div className="mt-2 flex justify-center space-x-4">
             <button className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
               Privacy
             </button>
@@ -159,7 +152,7 @@ export default function Home() {
             >
               Toggle Dark Mode
             </button>
-          </div>
+          </div> */}
         </div>
       </footer>
     </div>
