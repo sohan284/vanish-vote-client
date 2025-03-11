@@ -188,14 +188,39 @@ export default function PollPage() {
     }
   };
 
-  const handleLike = () => {
+  const handleLike = async () => {
     if (hasLiked) return;
 
-    setLikes((prev) => prev + 1);
-    setHasLiked(true);
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/polls/${id}/reaction`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            type: "like",
+          }),
+        }
+      );
 
-    // Save to localStorage
-    localStorage.setItem(`liked_${id}`, "true");
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.message || "Failed to like poll");
+      }
+
+      // Update UI with the new reactions from server
+      setLikes(data.data.reactions.like);
+      setHasLiked(true);
+
+      // Save to localStorage
+      localStorage.setItem(`liked_${id}`, "true");
+    } catch (err) {
+      console.error("Like error:", err);
+      alert("Could not update like count. Please try again.");
+    }
   };
 
   // Check if user has already voted or liked
@@ -392,7 +417,7 @@ export default function PollPage() {
                 </div>
               )}
 
-              <ShareButtons pollId={poll.pollId} />
+              <ShareButtons pollId={id} />
             </div>
           </div>
 
