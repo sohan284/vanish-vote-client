@@ -1,4 +1,5 @@
 import Link from "next/link";
+import PollsTable from "@/components/PollsTable";
 
 export default function Home() {
   return (
@@ -9,7 +10,7 @@ export default function Home() {
             VanishVote
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300">
-            Create anonymous polls that disappear when time's up
+            Create anonymous polls that disappear when time&apos;s up
           </p>
         </header>
 
@@ -91,6 +92,8 @@ export default function Home() {
           </div>
         </div>
 
+        <PollsTable />
+
         <div className="mt-20 max-w-5xl mx-auto">
           <h2 className="text-3xl font-bold text-center text-gray-800 dark:text-white mb-12">
             How It Works
@@ -132,8 +135,8 @@ export default function Home() {
                 Get Results & Vanish
               </h3>
               <p className="text-gray-600 dark:text-gray-300">
-                View live results. The poll automatically vanishes when time's
-                up.
+                View live results. The poll automatically vanishes when
+                time&apos;s up.
               </p>
             </div>
           </div>
