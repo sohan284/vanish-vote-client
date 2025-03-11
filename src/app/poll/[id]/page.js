@@ -392,7 +392,7 @@ export default function PollPage() {
                 </div>
               )}
 
-              <ShareButtons pollId={id} />
+              <ShareButtons pollId={poll.pollId} />
             </div>
           </div>
 
