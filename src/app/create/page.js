@@ -45,10 +45,7 @@ export default function CreatePoll() {
     const formData = {
       question,
       pollType: pollType === "multiple" ? "multiple-choice" : "yes-no",
-      options:
-        pollType === "yesno"
-          ? ["Yes", "No"]
-          : options.filter((option) => option.trim() !== ""),
+      options: options.filter((option) => option.trim() !== ""),
       expiresIn: parseInt(expiration),
       hideResults,
       isPrivate,
@@ -146,10 +143,7 @@ export default function CreatePoll() {
                       type="button"
                       onClick={() => {
                         setPollType("yesno");
-                        setOptions([
-                          { text: "Yes", votes: 0 },
-                          { text: "No", votes: 0 },
-                        ]);
+                        setOptions(["Yes", "No"]);
                       }}
                       className={`px-4 py-2 rounded-lg ${
                         pollType === "yesno"
