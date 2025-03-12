@@ -57,6 +57,9 @@ export default function PollsTable() {
             <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  Action
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Question
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -73,9 +76,6 @@ export default function PollsTable() {
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Expires
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Action
                 </th>
               </tr>
             </thead>
@@ -95,6 +95,14 @@ export default function PollsTable() {
                     key={poll._id}
                     className="hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <Link
+                        href={`/poll/${poll.pollId}`}
+                        className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 bg-[#364153] hover:bg-[#272727] px-3 py-2 rounded-md"
+                      >
+                        Vote Now
+                      </Link>
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-gray-700 dark:text-gray-300">
                       {poll.question}
                     </td>
@@ -112,14 +120,6 @@ export default function PollsTable() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-gray-700 dark:text-gray-300">
                       {new Date(poll.expiresAt).toLocaleString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <Link
-                        href={`/poll/${poll.pollId}`}
-                        className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-                      >
-                        Vote Now
-                      </Link>
                     </td>
                   </tr>
                 ))
