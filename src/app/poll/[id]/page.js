@@ -36,13 +36,22 @@ export default function PollPage() {
         const pollData = await response.json();
 
         if (pollData?.data) {
+          // Initialize options with vote count if not present
+          const optionsWithVotes = pollData.data.options.map((option) => ({
+            ...option,
+            votes: option.votes || 0, // Add votes property if not present
+          }));
+
           // Calculate total votes from options
-          const totalVoteCount = pollData.data.options.reduce(
+          const totalVoteCount = optionsWithVotes.reduce(
             (sum, option) => sum + (option.votes || 0),
             0
           );
 
-          setPoll(pollData.data);
+          setPoll({
+            ...pollData.data,
+            options: optionsWithVotes,
+          });
           setTotalVotes(totalVoteCount);
           setLikes(pollData.data.reactions?.like || 0);
           setIsTrending(pollData.data.reactions?.trending > 0);
@@ -113,16 +122,15 @@ export default function PollPage() {
 
       // Update the UI with the response data
       if (data.data?.options) {
-        // Calculate new total votes from updated options
-        const newTotalVotes = data.data.options.reduce(
-          (sum, option) => sum + (option.votes || 0),
-          0
-        );
-
         setPoll((prev) => ({
           ...prev,
           options: data.data.options,
         }));
+        // Recalculate total votes
+        const newTotalVotes = data.data.options.reduce(
+          (sum, option) => sum + (parseInt(option.votes) || 0),
+          0
+        );
         setTotalVotes(newTotalVotes);
       } else {
         // If results are hidden, increment local count
@@ -130,7 +138,7 @@ export default function PollPage() {
           ...prev,
           options: prev.options.map((opt) =>
             opt._id === selectedOption
-              ? { ...opt, votes: (opt.votes || 0) + 1 }
+              ? { ...opt, votes: parseInt(opt.votes || 0) + 1 }
               : opt
           ),
         }));
@@ -138,7 +146,7 @@ export default function PollPage() {
       }
 
       setHasVoted(true);
-      setShowResults(true);
+      setShowResults(!poll.hideResults);
 
       // Save to localStorage to remember the vote
       localStorage.setItem(`voted_${id}`, "true");
@@ -292,7 +300,7 @@ export default function PollPage() {
   // Calculate percentages for each option
   const getPercentage = (votes) => {
     if (totalVotes === 0) return 0;
-    return Math.round((votes / totalVotes) * 100);
+    return Math.round((parseInt(votes || 0) / totalVotes) * 100);
   };
 
   return (

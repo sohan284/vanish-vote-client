@@ -45,7 +45,12 @@ export default function CreatePoll() {
     const formData = {
       question,
       pollType: pollType === "multiple" ? "multiple-choice" : "yes-no",
-      options: options.filter((option) => option.trim() !== ""),
+      options: options
+        .filter((option) => option.trim() !== "")
+        .map((option) => ({
+          text: option,
+          votes: 0,
+        })),
       expiresIn: parseInt(expiration),
       hideResults,
       isPrivate,
